@@ -167,3 +167,13 @@
 - **1 балл** — объяснение архитектуры
 - **3 балла** — обоснование проектных решений
 - **2 балла** — ответы по темам лекций 1 и 2
+
+## Полезные ссылки
+https://learn.microsoft.com/ru-ru/dotnet/csharp/fundamentals/tutorials/oop
+https://learn.microsoft.com/ru-ru/dotnet/csharp/language-reference/builtin-types/value-types
+https://learn.microsoft.com/ru-ru/dotnet/csharp/language-reference/keywords/reference-types
+https://learn.microsoft.com/ru-ru/dotnet/csharp/fundamentals/tutorials/inheritance
+https://learn.microsoft.com/ru-ru/dotnet/csharp/language-reference/statements/exception-handling-statements#the-try-catch-statement
+
+Также будет плюсом, если вы ознакомитесь с правилами код-стайла и будете придерживаться их при выполнении работы.
+https://learn.microsoft.com/ru-ru/dotnet/csharp/fundamentals/coding-style/identifier-names
