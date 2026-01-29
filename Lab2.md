@@ -35,7 +35,7 @@
 
 #### Требования:
 
-* Создать интерфейс `IEntity` с `int Id { get; }`.
+* Создать интерфейс `IEntity` с `Guid Id { get; }`.
 * Все сущности должны реализовывать `IEntity`.
 * Создать интерфейс репозитория:
 
@@ -44,8 +44,8 @@ public interface IRepository<T> where T : IEntity
 {
     void Add(T entity);
     IReadOnlyList<T> GetAll();
-    T? GetById(int id);
-    void Remove(int id);
+    T? GetById(Guid id);
+    void Remove(Guid id);
     IReadOnlyList<T> Find(Func<T, bool> predicate);
 }
 ```
@@ -78,7 +78,7 @@ public interface IRepository<T> where T : IEntity
 
 ```csharp
 IRepository<User> userRepository = new InMemoryRepository<User>();
-userRepository.Add(new User { Id = 1, Name = "Alex" });
+userRepository.Add(new User { Name = "Alex" });
 
 var foundUsers = userRepository.Find(u => u.Name.StartsWith("A"));
 ```
