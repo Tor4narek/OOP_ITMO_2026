@@ -1,6 +1,6 @@
 # Лабораторная работа №4
 
-## Базы данных и Entity Framework Core
+## Работа с базами данных и Entity Framework Core.
 
 
 ## Цель работы
