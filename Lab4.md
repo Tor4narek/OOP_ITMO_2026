@@ -1,264 +1,306 @@
 # Лабораторная работа №4
 
-## Работа с базами данных и Entity Framework Core.
-
+## Работа с базами данных и Entity Framework Core
 
 ## Цель работы
 
-Освоение принципов работы с реляционными базами данных и взаимодействия с ними из C#-приложения с использованием **Entity Framework Core**.
+Освоение работы с реляционными базами данных из C#-приложения с использованием **Entity Framework Core**.
 
 В рамках работы студент:
 
-* знакомится с основами SQL;
-* самостоятельно создаёт базу данных и таблицы в **SQL Server**;
-* подключает приложение к существующей базе данных;
-* реализует **CRUD-операции** через EF Core;
-* использует паттерн **Repository** для изоляции бизнес-логики от способа хранения данных.
+* изучает принципы хранения данных в реляционных базах;
+* подключает приложение к базе данных через **EF Core**;
+* проектирует структуру таблиц на основе сущностей приложения;
+* создает базу данных с помощью **миграций**;
+* реализует **CRUD-операции** для сущностей предметной области;
+* использует паттерн **Repository** для разделения бизнес-логики и слоя хранения данных.
 
+---
 
-## Выбор варианта
+# Выбор варианта
 
 Номер варианта — номер в журнале.
 
 Предметная область определяется вариантом, выбранным в **ЛР-1, ЛР-2 и ЛР-3**.
-Архитектура и бизнес-логика приложения продолжают развиваться без изменений.
 
+Структура приложения и бизнес-логика продолжают развиваться на основе предыдущих лабораторных работ.
 
-## Общая идея приложения
+# Общая идея приложения
 
-Приложение работает с данными, хранящимися в **реляционной базе данных SQL Server**.
+На предыдущих лабораторных данные хранились:
 
-* Все данные хранятся в БД
-* База данных создаётся **вручную**, вне C#
-* Доступ к данным осуществляется через **EF Core**
-* Используется интерфейс `IRepository<T>`
-* Бизнес-логика не зависит от способа хранения данных
-* Приложение работает в рамках одного запуска (консольное)
+* в памяти
+* в файлах
 
+В этой работе приложение должно перейти на хранение данных в **реляционной базе данных**.
 
-## Предварительная подготовка: SQL
+Основные принципы:
 
-Перед выполнением лабораторной работы студент **обязан** ознакомиться с основами SQL.
+* все данные хранятся в базе данных;
+* доступ к данным осуществляется через **Entity Framework Core**;
+* структура БД описывается через C#-классы;
+* база данных создается через **миграции EF Core**;
+* используется интерфейс `IRepository<T>`;
+* бизнес-логика не зависит от способа хранения данных;
+* приложение остается **консольным**.
 
-### Обязательное задание
+---
 
-Пройти интерактивный курс:
+# Техническое задание
 
-👉 [https://sql-academy.org/ru/guide](https://sql-academy.org/ru/guide)
-
-Минимально необходимо понимать:
-
-* `CREATE TABLE`
-* `PRIMARY KEY`
-* `FOREIGN KEY`
-* `INSERT`
-* `SELECT`
-* `UPDATE`
-* `DELETE`
-* `WHERE`
-На защите лабораторной работы показать пройденный курс.
-
-
-## Техническое задание
-
-
-## 1. Создание базы данных
+## 1. Подключение базы данных
 
 ### Задача
 
-Самостоятельно создать базу данных и таблицы предметной области.
+Подключить приложение к базе данных **SQL Server** через **Entity Framework Core**.
 
 ### Требования
 
-* Использовать **SQL Server**
-* Создать базу данных вручную:
+Необходимо установить пакеты:
 
-  * через SQL Server Management Studio
-    **или**
-  * через SQL-скрипт
-* Создать таблицы, соответствующие сущностям предметной области
-* Определить:
+* `Microsoft.EntityFrameworkCore`
+* `Microsoft.EntityFrameworkCore.SqlServer`
+* `Microsoft.EntityFrameworkCore.Tools`
 
-  * первичные ключи (`PRIMARY KEY`)
-  * внешние ключи (`FOREIGN KEY`) — при необходимости
-  * ограничения (`NOT NULL`, `UNIQUE`) — по желанию
-
-📌 **EF Core не должен создавать или изменять схему БД**
-
-
-## 2. Подключение EF Core к существующей БД
-
-### Задача
-
-Подключить C#-приложение к уже созданной базе данных.
-
-### Требования
-
-* Использовать **Entity Framework Core**
-* Использовать провайдер **Microsoft.EntityFrameworkCore.SqlServer**
-* Строка подключения хранится в `appsettings.json`
+Строка подключения должна храниться в `appsettings.json`.
 
 Пример:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=.;Database=Lab4Db;Trusted_Connection=True;"
+    "DefaultConnection": "Server=.;Database=Lab4Db;Trusted_Connection=True;TrustServerCertificate=True;"
   }
 }
 ```
 
+---
 
-## 3. DbContext
+# 2. Создание моделей данных
 
 ### Задача
 
-Создать `DbContext`, соответствующий существующей базе данных.
+Создать модели предметной области, которые будут храниться в базе данных.
 
 ### Требования
 
-* `DbContext` должен:
+* каждая сущность должна быть отдельным классом;
+* каждая сущность должна реализовывать `IEntity`;
+* у каждой сущности должен быть первичный ключ `Id`;
+* должно быть минимум **две сущности**;
+* между сущностями должна быть реализована **связь 1:N**.
 
-  * содержать `DbSet<T>` для каждой сущности;
-  * использовать строку подключения из конфигурации;
-* Запрещено:
+Пример:
 
-  * использовать миграции;
-  * использовать `EnsureCreated()`;
-  * автоматически создавать БД.
+```csharp
+public interface IEntity
+{
+    Guid Id { get; set; }
+}
+
+public class Author : IEntity
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+
+    public List<Book> Books { get; set; } = new();
+}
+
+public class Book : IEntity
+{
+    public Guid Id { get; set; }
+    public string Title { get; set; }
+
+    public Guid AuthorId { get; set; }
+    public Author Author { get; set; }
+}
+```
+
+---
+
+# 3. Создание DbContext
+
+### Задача
+
+Создать контекст базы данных.
+
+### Требования
+
+Класс должен:
+
+* наследоваться от `DbContext`;
+* содержать `DbSet<T>` для каждой сущности;
+* настраивать связи через **Fluent API**.
 
 Пример:
 
 ```csharp
 public class AppDbContext : DbContext
 {
-    public DbSet<User> Users { get; set; }
+    public DbSet<Author> Authors => Set<Author>();
+    public DbSet<Book> Books => Set<Book>();
 
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
     {
-        options.UseSqlServer(
-            ConfigurationManager
-                .ConnectionStrings["DefaultConnection"]
-                .ConnectionString
-        );
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Author>()
+            .HasKey(a => a.Id);
+
+        modelBuilder.Entity<Book>()
+            .HasKey(b => b.Id);
+
+        modelBuilder.Entity<Book>()
+            .HasOne(b => b.Author)
+            .WithMany(a => a.Books)
+            .HasForeignKey(b => b.AuthorId);
     }
 }
 ```
 
+---
 
-## 4. Сопоставление сущностей и таблиц
+# 4. Миграции EF Core
 
 ### Задача
 
-Обеспечить корректное соответствие C#-классов и таблиц БД.
+Создать базу данных и таблицы через механизм **миграций EF Core**.
 
 ### Требования
 
-* Использовать атрибуты:
+Необходимо:
 
-  * `[Table]`
-  * `[Key]`
-  * `[Column]`
-* Свойства классов должны соответствовать полям таблиц
-* Класс обязан реализовывать `IEntity`
+1. создать первую миграцию
+2. применить ее к базе данных
+3. убедиться, что таблицы созданы
 
-Пример:
+Пример команд:
 
-```csharp
-[Table("Users")]
-public class User : IEntity
-{
-    [Key]
-    public Guid Id { get; set; }
-
-    [Column("Name")]
-    public string Name { get; set; }
-}
+```
+dotnet ef migrations add InitialCreate
+dotnet ef database update
 ```
 
+В проекте должна появиться папка:
 
-## 5. Репозиторий EF Core
+```
+Migrations
+```
 
-### Задача
+---
 
-Создать реализацию `IRepository<T>` для работы с БД через EF Core.
-
-### Требования
-
-* Использовать **тот же интерфейс `IRepository<T>`**, что в ЛР-2 и ЛР-3
-* Реализовать CRUD-операции:
-
-  * Create
-  * Read
-  * Update
-  * Delete
-* Все операции должны быть асинхронными
-* Использовать `DbContext` и `DbSet<T>`
-
-
-
-## 6. Интеграция с приложением
+# 5. Реализация репозитория EF Core
 
 ### Задача
 
-Заменить файловый репозиторий из ЛР-3 на репозиторий EF Core.
+Реализовать доступ к базе данных через **паттерн Repository**.
 
-### Требования
+Используется интерфейс `IRepository<T>` из предыдущих лабораторных.
 
-* В `Main` и сервисах использовать только `IRepository<T>`
-* Бизнес-логика **не должна изменяться**
-* Меняется только реализация слоя хранения данных
+---
 
+# 6. Реализация CRUD-операций
 
-## Требования к реализации
+В программе должны быть реализованы следующие операции:
 
-В программе **обязательно** должно быть использовано:
+### Create
 
-* SQL Server
-* ручное создание БД
-* Entity Framework Core
+Добавление новой записи в базу данных.
+
+### Read
+
+Получение:
+
+* одной записи
+* списка записей
+
+### Update
+
+Изменение существующей записи.
+
+### Delete
+
+Удаление записи из базы данных.
+
+Все операции должны выполняться через:
+
 * `DbContext`
 * `DbSet<T>`
-* `class`, `interface`, `Generics`
+* `IRepository<T>`
+* `async / await`
+
+Использование транзакций **не требуется**.
+
+---
+
+# 7. Интеграция с приложением
+
+### Задача
+
+Заменить файловый репозиторий из **ЛР-3** на репозиторий **EF Core**.
+
+### Требования
+
+* бизнес-логика приложения не должна изменяться;
+* сервисы должны работать через `IRepository<T>`;
+* изменяется только реализация хранения данных.
+
+---
+
+# Требования к реализации
+
+В программе обязательно должно использоваться:
+
+* SQL Server
+* Entity Framework Core
+* миграции EF Core
+* `DbContext`
+* `DbSet<T>`
+* `class`
+* `interface`
+* `Generics`
 * `async / await`
 * паттерн Repository
 * CRUD-операции
 
+---
 
-## Запрещено
+# Запрещено
 
-* Миграции EF Core
-* Автоматическое создание БД
-* `EnsureCreated()`
-* ADO.NET
-* Внешние ORM
-* Внешние библиотеки
-
-
-## Критерии оценки
-
-### Код программы (8 баллов)
-
-* **4 балла** — корректная работа CRUD-операций через EF Core
-* **2 балла** — соответствие моделей схеме БД
-* **2 балла** — логичная архитектура и использование репозитория
-
-### Защита работы (7 баллов)
-
-* **2 балла** — объяснение структуры БД
-* **2 балла** — понимание роли EF Core
-* **3 балла** — ответы по темам:
-
-  * SQL
-  * DbContext
-  * Repository
-  * разделение слоёв приложения
+* другие ORM
+* хранение данных в файлах
+* синхронные методы доступа к БД
 
 ---
 
-## Полезные ссылки
+# Критерии оценки
 
-* [https://sql-academy.org/ru/guide](https://sql-academy.org/ru/guide)
-* [https://learn.microsoft.com/ru-ru/ef/core/](https://learn.microsoft.com/ru-ru/ef/core/)
-* [https://learn.microsoft.com/ru-ru/ef/core/dbcontext-configuration/](https://learn.microsoft.com/ru-ru/ef/core/dbcontext-configuration/)
-* [https://learn.microsoft.com/ru-ru/dotnet/csharp/fundamentals/tutorials/oop](https://learn.microsoft.com/ru-ru/dotnet/csharp/fundamentals/tutorials/oop)
+## Код программы (8 баллов)
+
+4 балла — корректная работа CRUD-операций через EF Core
+2 балла — корректная настройка DbContext и связей
+2 балла — использование репозитория
+
+## Защита работы (7 баллов)
+
+2 балла — объяснение структуры базы данных
+2 балла — понимание EF Core
+3 балла — ответы по темам:
+
+* SQL
+* DbContext
+* Repository
+* связи между таблицами
+* миграции
+
+---
+
+# Полезные ссылки
+
+[https://learn.microsoft.com/ru-ru/ef/core/](https://learn.microsoft.com/ru-ru/ef/core/)
+[https://learn.microsoft.com/ru-ru/ef/core/dbcontext-configuration/](https://learn.microsoft.com/ru-ru/ef/core/dbcontext-configuration/)
+[https://learn.microsoft.com/ru-ru/ef/core/managing-schemas/migrations/](https://learn.microsoft.com/ru-ru/ef/core/managing-schemas/migrations/)
+[https://learn.microsoft.com/ru-ru/ef/core/providers/sql-server/](https://learn.microsoft.com/ru-ru/ef/core/providers/sql-server/)
