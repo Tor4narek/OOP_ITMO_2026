@@ -31,16 +31,6 @@
 
 # Общая идея приложения
 
-В предыдущих лабораторных работах приложение постепенно усложнялось:
-
-* данные хранились **в памяти**;
-* затем **в файлах**;
-* затем **в базе данных через Entity Framework Core**.
-
-В данной лабораторной работе необходимо перейти к следующему этапу — **архитектурной организации приложения**.
-
-Основные принципы:
-
 * приложение реализуется как **чистый монолит**;
 * код разделяется на **архитектурные слои**;
 * зависимости между компонентами управляются через **Dependency Injection**;
@@ -127,7 +117,6 @@ Solution
 * основные интерфейсы;
 * сущности предметной области;
 * прикладные сервисы;
-* `DbContext`;
 * связи между компонентами системы.
 
 Диаграмма должна показывать, **какие именно классы и интерфейсы будут реализованы в программе**.
@@ -309,34 +298,37 @@ var provider = services.BuildServiceProvider();
 
 # Критерии оценки
 
-## Архитектура приложения (8 баллов)
+## Архитектура приложения (1 баллов)
 
-3 балла — корректная UML-диаграмма архитектуры
-3 балла — корректное разделение на проекты
-2 балла — применение принципов SOLID
-
-
-## Код программы (8 баллов)
-
-3 балла — корректная реализация CRUD-операций
-3 балла — использование сервисного слоя
-2 балла — корректная настройка Dependency Injection
+корректная UML-диаграмма архитектуры
+корректное разделение на проекты
+применение принципов SOLID
 
 
-## Защита работы (4 балла)
+## Код программы (10 баллов)
+
+2 балла — корректная реализация классов
+2 балла — использование и создание собственных исключений
+2 балла — корректная реализация асинхронных механизмов
+2 балла — код выполнен в едином стиле
+2 балла — корректная настройка Dependency Injection и зависимостей
+
+
+## Защита работы (10 балла)
 
 Студент должен объяснить:
 
 * принципы **SOLID**;
 * архитектуру слоев приложения;
 * **Dependency Injection**;
+* вопросы по темам лекций
 
 
 # Полезные ссылки
 
 [https://learn.microsoft.com/ru-ru/dotnet/core/extensions/dependency-injection](https://learn.microsoft.com/ru-ru/dotnet/core/extensions/dependency-injection)
 
-[https://learn.microsoft.com/ru-ru/ef/core/](https://learn.microsoft.com/ru-ru/ef/core/)
+[https://jasulib.org.kg/wp-content/uploads/2024/02/Chistaya_arkhitektura_Iskusstvo_razrabotki_programmnogo_obespechenia.pdf](https://jasulib.org.kg/wp-content/uploads/2024/02/Chistaya_arkhitektura_Iskusstvo_razrabotki_programmnogo_obespechenia.pdf)
 
 [https://learn.microsoft.com/ru-ru/ef/core/dbcontext-configuration/](https://learn.microsoft.com/ru-ru/ef/core/dbcontext-configuration/)
 
